@@ -1,0 +1,75 @@
+body {
+    font-family: "Helvetica",sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 95%;
+    /* text-align: center; */
+}
+
+#new-post-container, .post-container {
+    min-width: 500px;
+    border: 2px solid LightGray;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+#posts-container {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#new-post-container {
+    background-color: GhostWhite;
+    margin-bottom: 20px;
+}
+
+#new-post-header {
+    background-color: Gainsboro;
+    margin: -15px -15px 20px -15px;
+    padding: 15px;
+}
+
+.form-entry, #status-message, .post-heading {
+    margin-bottom: 20px;
+}
+
+.status-err {
+    background-color: LightCoral;
+    border: 2px solid Crimson;
+    border-radius: 5px;
+    padding: 15px;
+}
+
+.status-success {
+    background-color: MediumAquaMarine;
+    border: 2px solid LightGreen;
+    border-radius: 5px;
+    padding: 15px;
+}
+
+#submit-btn {
+    font-size: 12pt;
+    border-radius: 5px;
+    padding: 8px;
+}
+
+input[type="text"], textarea, .post-heading {
+    width: 100%;
+}
+
+.post-date {
+    color: Gray;
+    float: right;
+}
+
+.post-author {
+    font-size: 14pt;
+    font-weight: bold;
+}
+
+.post-content {
+    color: #505050;
+}
