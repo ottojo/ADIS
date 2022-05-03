@@ -1,4 +1,4 @@
-# Assignment 1, all tasks
+# Assignment 1, Task 2
 
 ### Setup
 * Setup via Docker
@@ -8,9 +8,3 @@
     docker run -it --rm -p 8080:80 <NAME>
     ```
 * Website available under `http://localhost:8080`
-
-### TODO
-* Proper documentation
-* Maybe less fragile data storage
-* Improved input sanitization ?
-
