@@ -1,0 +1,89 @@
+body {
+    font-family: "Helvetica",sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 95%;
+    /* text-align: center; */
+}
+
+#form-container, .post-container {
+    min-width: 500px;
+    border: 2px solid LightGray;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+#posts-container {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#form-container {
+    background-color: GhostWhite;
+    margin-bottom: 20px;
+}
+
+#form-heading {
+    background-color: Gainsboro;
+    margin: -15px -15px 20px -15px;
+    padding: 15px;
+}
+
+.form-entry, #status-message, .post-heading {
+    margin-bottom: 20px;
+}
+
+.status-err {
+    background-color: LightCoral;
+    border: 2px solid Crimson;
+    border-radius: 5px;
+    padding: 15px;
+}
+
+.status-success {
+    background-color: MediumAquaMarine;
+    border: 2px solid LightGreen;
+    border-radius: 5px;
+    padding: 15px;
+}
+
+#submit-btn {
+    font-size: 12pt;
+    border-radius: .25rem;
+    border-color: #007bff;
+    padding: 8px;
+    color: white;
+    background-color: #007bff;
+}
+
+input[type="text"], input[type="password"], textarea, .post-heading {
+    width: 100%;
+}
+
+#logout-btn {
+    font-size: 12pt;
+    border-radius: .25rem;
+    border-color: #dc3545;
+    padding: 8px;
+    color: white;
+    background-color: #dc3545;
+    float: right;
+    margin-top: -10px;
+}
+
+.post-date {
+    color: Gray;
+    float: right;
+}
+
+.post-author {
+    font-size: 14pt;
+    font-weight: bold;
+}
+
+.post-content {
+    color: #505050;
+}
