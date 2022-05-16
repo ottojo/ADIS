@@ -33,8 +33,8 @@
 4. Disable default vhost and enable 001-roary host, e.g. using
 
     ```console
-    a2dissite a2dissite 000-default
-    a2ensite a2ensite 001-roary
+    a2dissite 000-default
+    a2ensite 001-roary
     ```
 
 5. Reload the apache2 service, e.g.
