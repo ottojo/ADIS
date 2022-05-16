@@ -14,7 +14,6 @@
     // User doesn't exist => redirect to logout page to clear session
     if (!$user) {
         header("Location: ./logout.php");
-        die();
     }
 
     $db->close();
