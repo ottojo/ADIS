@@ -6,6 +6,12 @@ if (!array_key_exists("username", $_SESSION)) {
     return;
 }
 
+if (strlen($_POST["message"]) > 128) {
+    http_response_code(401);
+    echo "Roar exceeds 128 character limit!";
+    return;
+}
+
 require "SQLiteConnection.php";
 $conn = new SQLiteConnection;
 $conn->connect();
