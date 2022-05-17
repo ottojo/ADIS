@@ -48,7 +48,11 @@ class SQLiteConnection
         $stmt = $this->pdo->prepare($insert);
         $stmt->bindParam(':name', $username);
         $stmt->bindParam(':pw', $hashed_pw);
-        $result = $stmt->execute();
+        try {
+            $result = $stmt->execute();
+        } catch (PDOException $e) {
+            return false;
+        }
         return $result;
     }
 

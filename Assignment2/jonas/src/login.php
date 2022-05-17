@@ -36,6 +36,7 @@ if (array_key_exists("login", $_POST)) {
     } else {
         http_response_code(400);
         echo "Username already taken!";
+        return;
     }
 } else {
     http_response_code(400);
