@@ -1,0 +1,17 @@
+<html lang="en">
+<head>
+    <title>Roar!</title>
+</head>
+
+<body>
+{% if latest_roars_list %}
+    <ul>
+        {% for roar in latest_roars_list %}
+            <li><a href="{% url 'roars:detail' roar.id %}">{{ roar.text }}</a></li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No roars are available.</p>
+{% endif %}
+</body>
+</html>
