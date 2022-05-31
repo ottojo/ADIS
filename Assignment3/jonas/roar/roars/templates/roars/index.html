@@ -1,17 +1,52 @@
 <html lang="en">
 <head>
     <title>Roar!</title>
+    <script>
+        function updateRoars() {
+            console.log("updating roars");
+            const xhttp = new XMLHttpRequest();
+            xhttp.onload = function () {
+                const container = document.getElementById("roarlist");
+                container.innerHTML = this.responseText;
+            }
+            xhttp.open("GET", "{% url 'roars:roars_html' %}", true);
+            xhttp.send();
+        }
+
+        updateRoars();
+        setInterval(updateRoars, 1000);
+    </script>
 </head>
 
 <body>
-{% if latest_roars_list %}
-    <ul>
-        {% for roar in latest_roars_list %}
-            <li><a href="{% url 'roars:detail' roar.id %}">{{ roar.text }}</a></li>
-        {% endfor %}
-    </ul>
+
+{% if user.is_authenticated %}
+    <a href="{% url 'logout' %}">logout</a>
+
+    <p>Hello {{ user.username }}!</p>
 {% else %}
-    <p>No roars are available.</p>
+    <a href="{% url 'login' %}">login</a>
+    <a href="{% url 'signup' %}">sign up</a>
 {% endif %}
+
+{% if user.is_authenticated %}
+    <form action="{% url 'roars:post' %}" method="post">
+        {% csrf_token %}
+        <fieldset>
+            <legend><h2>Post a Roar!</h2></legend>
+
+            {% if error_message %}
+                <p><strong>{{ error_message }}</strong></p>
+            {% endif %}
+
+            <textarea name="text" cols="50" rows="4"></textarea>
+            <br>
+            <input type="submit" value="Roar">
+        </fieldset>
+    </form>
+{% endif %}
+
+<div id="roarlist">
+</div>
 </body>
 </html>

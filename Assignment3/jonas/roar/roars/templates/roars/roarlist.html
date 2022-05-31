@@ -1,0 +1,20 @@
+{% load humanize %}
+
+{% if latest_roars_list %}
+    <ul>
+        {% for roar in latest_roars_list %}
+            <li>{{ roar.author.username }}, {{ roar.timestamp | naturaltime }}: {{ roar.text }}
+                ({{ roar.likes.count }})
+                {% if user.is_authenticated %}
+                    {% if user in roar.likes.all %}
+                        <a href="{% url 'roars:unlike' roar.id %}">unlike</a>
+                    {% else %}
+                        <a href="{% url 'roars:like' roar.id %}">like</a>
+                    {% endif %}
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No roars are available.</p>
+{% endif %}

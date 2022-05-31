@@ -1,0 +1,10 @@
+Liked roars of user "{{ user.username }}"
+{% if liked_roars_list %}
+    <ul>
+        {% for roar in liked_roars_list %}
+            <li>{{ roar }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No roars are available.</p>
+{% endif %}
