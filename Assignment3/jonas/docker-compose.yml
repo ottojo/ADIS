@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  django-webserver:
+    build: docker_roar
+    tty: true
+    volumes:
+      - ./roar:/roar
+    ports:
+      - "8000:8000"
+    command: /run.sh
