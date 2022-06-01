@@ -24,6 +24,7 @@
     <a href="{% url 'logout' %}">logout</a>
 
     <p>Hello {{ user.username }}!</p>
+    <p><a href="{% url 'roars:user_likes' user.pk %}">My liked Roars</a></p>
 {% else %}
     <a href="{% url 'login' %}">login</a>
     <a href="{% url 'signup' %}">sign up</a>
