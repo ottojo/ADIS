@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Roary v0.4</title>
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+            <div class="container">
+                <a class="navbar-brand" href="/">Roary v0.4</a>
+
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item" data-route="login">
+                        <a class="nav-link" href="/#/login">Login</a>
+                    </li>
+                    <li class="nav-item" data-route="register">
+                        <a class="nav-link" href="/#/register">Register</a>
+                    </li>
+
+                    <li class="nav-item" data-route="liked">
+                        <a class="nav-link" href="/#/liked">Liked Roars</a>
+                    </li>
+                    <li class="nav-item" data-route="logout">
+                        <a class="nav-link" href="/#/logout">Logout <small>(name)</small></a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="py-4">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <main>
+                            <div class="card d-none" id="roary-login">
+                                <div class="card-header">Login</div>
+                                <div class="card-body">
+                                    <form>
+                                        <div class="form-group row">
+                                            <label class="col-md-4 col-form-label text-md-right">E-Mail Address</label>
+                                            <div class="col-md-6">
+                                                <input type="email" name="email" value="" required autofocus class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <label class="col-md-4 col-form-label text-md-right">Password</label>
+                                            <div class="col-md-6">
+                                                <input type="password" name="password" required class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row mb-0">
+                                            <div class="col-md-8 offset-md-4">
+                                                <button type="submit" class="btn btn-primary">
+                                                    Login
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="card d-none" id="roary-register">
+                                <div class="card-header">Register</div>
+                                <div class="card-body">
+                                    <form>
+                                        <div class="form-group row">
+                                            <label class="col-md-4 col-form-label text-md-right">Username</label>
+                                            <div class="col-md-6">
+                                                <input type="text" name="username" value="" required autofocus class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-md-4 col-form-label text-md-right">E-Mail Address</label>
+                                            <div class="col-md-6">
+                                                <input type="email" name="email" value="" required class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-md-4 col-form-label text-md-right">Password</label>
+                                            <div class="col-md-6">
+                                                <input type="password" name="password" required class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row mb-0">
+                                            <div class="col-md-6 offset-md-4">
+                                                <button type="submit" class="btn btn-primary">
+                                                    Register
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="card d-none" id="login-required">
+                                <div class="card-body">
+                                    Log in to post new Roars...
+                                </div>
+                            </div>
+
+                            <div class="card d-none" id="roar-form">
+                                <div class="card-header">New Roar</div>
+
+                                <div class="card-body">
+                                    <form>
+                                        <div class="form-group">
+                                            <textarea class="form-control" name="message" rows="3" required autofocus></textarea>
+                                            <div class="invalid-feedback" role="alert"></div>
+                                        </div>
+
+                                        <div class="float-right">
+                                            <button type="submit" name="submit" class="btn btn-info">Post Roar</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="mt-3 d-none" id="roar-list">
+                            </div>
+                        </main>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            // ############################################### //
+            //           Handler for route change              //
+            // ############################################### //
+            function routeChanged() {
+                document.getElementById('roar-form').classList.add('d-none');
+                document.getElementById('roar-list').classList.add('d-none');
+                document.getElementById('roary-login').classList.add('d-none');
+                document.getElementById('roary-register').classList.add('d-none');
+                document.getElementById('login-required').classList.add('d-none');
+
+                switch (location.hash) {
+                    case '#/login':
+                        document.getElementById('roary-login').classList.remove('d-none');
+                        break;
+
+                    case '#/logout':
+                        logout();
+                        break;
+
+                    case '#/register':
+                        document.getElementById('roary-register').classList.remove('d-none');
+                        break;
+
+                    case '#/liked':
+                        if (localStorage.getItem('username') !== null) {
+                            document.getElementById('roar-list').classList.remove('d-none');
+                        } else {
+                            document.getElementById('login-required').classList.remove('d-none');
+                        }
+
+                        // reset roar list and fetch roars
+                        document.getElementById('roar-list').textContent = '';
+                        localStorage.setItem('lastMsgTime', "0"); // the time of the last fetched Roar (see fetchRoars)
+                        fetchRoars();
+                        break;
+
+                    case '#/':
+                        if (localStorage.getItem('username') !== null) {
+                            document.getElementById('roar-form').classList.remove('d-none');
+                            document.getElementById('roar-list').classList.remove('d-none');
+                        } else {
+                            document.getElementById('login-required').classList.remove('d-none');
+                        }
+
+                        // reset roar list and fetch roars
+                        document.getElementById('roar-list').textContent = '';
+                        localStorage.setItem('lastMsgTime', "0"); // the time of the last fetched Roar (see fetchRoars)
+                        fetchRoars();
+                        break;
+
+                    default:
+                        location.hash = '/';
+                }
+
+                if (localStorage.getItem('username') !== null) {
+                    document.querySelector('nav li[data-route="login"]').classList.add('d-none');
+                    document.querySelector('nav li[data-route="register"]').classList.add('d-none');
+                    document.querySelector('nav li[data-route="logout"]').classList.remove('d-none');
+                    document.querySelector('nav li[data-route="liked"]').classList.remove('d-none');
+                    document.querySelector('nav li[data-route="logout"] small').innerText = `(${localStorage.getItem('username')})`;
+                } else {
+                    document.querySelector('nav li[data-route="login"]').classList.remove('d-none');
+                    document.querySelector('nav li[data-route="register"]').classList.remove('d-none');
+                    document.querySelector('nav li[data-route="logout"]').classList.add('d-none');
+                    document.querySelector('nav li[data-route="liked"]').classList.add('d-none');
+                }
+            }
+
+            // ############################################### //
+            //                   login routine                 //
+            // ############################################### //
+            async function login(e) {
+                e.preventDefault();
+                let resp;
+
+                try {
+                    resp = await fetch("api/login", {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                        body: "email=" + encodeURIComponent(document.querySelector('#roary-login input[name="email"]').value) +
+                                "&password="  + encodeURIComponent(document.querySelector('#roary-login input[name="password"]').value)
+                    });
+                }  catch (err) {
+                    console.log(err);
+                    return;
+                }
+
+                // reponse json has keys error and errMsg/username (if error is true/false)
+                const json = await resp.json();
+                
+                if (!json.error) {
+                    document.querySelector('#roary-login input[name="email"]').classList.remove('is-invalid');
+                    document.querySelector('#roary-login input[name="email"]').value = '';
+                    localStorage.setItem('username', json.username);
+                    localStorage.setItem('lastMsgTime', "0"); // See fetchRoars
+                    location.hash = '/';
+                } else {
+                    document.querySelector('#roary-login input[name="email"]').classList.add('is-invalid');
+                }
+            }
+
+            // ############################################### //
+            //                  register routine               //
+            // ############################################### //
+            async function register(e) {
+                e.preventDefault();
+                let resp;
+
+                try {
+                    resp = await fetch("api/register", {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                        body: "email=" + encodeURIComponent(document.querySelector('#roary-register input[name="email"]').value) +
+                                "&password="  + encodeURIComponent(document.querySelector('#roary-register input[name="password"]').value) + 
+                                "&username="  + encodeURIComponent(document.querySelector('#roary-register input[name="username"]').value)
+                    });
+                }  catch (err) {
+                    console.log(err);
+                    return;
+                }
+
+                // reponse json has keys error and errMsg (if error is true)
+                const json = await resp.json();
+                const message = json.error ? json.errMsg : 'Successfully registered';
+
+                const response = document.createElement('div');
+                response.className = 'alert';
+                response.innerText = message;
+                response.classList.add(json.error ? 'alert-danger' : 'alert-success');
+
+                // remove previous alert
+                document.querySelectorAll('#roary-register div.alert').forEach(e => e.parentNode.removeChild(e));
+                // display new alert
+                document.querySelector('#roary-register form').insertAdjacentElement('afterBegin', response);
+            }
+
+            // ############################################### //
+            //                    lgout routine                //
+            // ############################################### //
+            async function logout() {
+                try {
+                    // lgout will always be successful (apart from network errors)
+                    await fetch("api/logout", {method: 'POST'});
+                }  catch (err) {
+                    console.log(err);
+                    return;
+                }
+
+                localStorage.clear();
+                location.hash = '#/login';
+            }
+
+            // ############################################### //
+            //                   posting routine               //
+            // ############################################### //
+            async function postRoar(e) {
+                e.preventDefault();
+                
+                // Check that we're logged in
+                if (!localStorage.getItem('username')) {
+                    return;
+                }
+
+                const message = document.querySelector('#roar-form textarea').value;
+                let error = message.length > 128 ? 'Message is too long' : null; // error message, null == no error
+
+                // Only try fetch if client side validation didn't already fail
+                if (!error) {
+                    let resp;
+                    try {
+                        resp = await fetch("api/postRoar", {
+                            method: 'POST',
+                            headers: {'Content-Type': 'text/plain'},
+                            body: message
+                        });
+                    }
+                    catch (err) {
+                        console.log(err);
+                        return;
+                    }
+
+                    // 403 means not logged in. This can happen if session cookies expire since localStorage doesn't expire
+                    if (resp.status == 403) {
+                        logout();
+                        return;
+                    }
+
+                    // the response has two keys:: error and errMsg (only if error is true)
+                    const json = resp.ok ? await resp.json() : {"error": resp.statusText};
+                    if (json.error) error = json.errMsg;
+                }
+
+                if (!error) {
+                    document.querySelector('#roar-form textarea[name="message"]').classList.remove('is-invalid');
+                    document.querySelector('#roar-form textarea[name="message"]').value = '';
+                } else {
+                    document.querySelector('#roar-form .invalid-feedback').textContent = error;
+                    document.querySelector('#roar-form textarea[name="message"]').classList.add('is-invalid');
+                }
+            }
+
+            // ############################################### //
+            //              Roar fetching routine              //
+            // ############################################### //
+            async function fetchRoars() {
+                // Only try fetching if logged in
+                if (!localStorage.getItem('username') || !localStorage.getItem('lastMsgTime')) {
+                    return;
+                }
+
+                // "lastMsgTime" is the time of the newest roar that was fetch last time. This will ensure only
+                // new Roar's are fetched. Technically, this has a flaw: Roar's with the same timestamp might be
+                // skipped so a sequence number (e.g. Roar ID) is better but this will do for now.
+
+                let resp;
+                try {
+                    resp = await fetch("api/getRoars?upTo=" + localStorage.getItem('lastMsgTime') + "&limit=200");
+                } catch (err) {
+                    console.log(err);
+                    return;
+                }
+
+                // 403 means not logged in. This can happen if session cookies expire since localStorage doesn't expire
+                if (resp.status == 403)
+                    return logout();
+
+                // response json is a list of Roar objects
+                const json = await resp.json();
+
+                // If there's a least one new roar. The last index will be the newest Roar, so update lastMsgTime
+                if (json.length > 0) {
+                    localStorage.setItem('lastMsgTime', "" + json[json.length-1].date);
+                }
+
+                for (const roar of json) {
+                    if (location.hash === '#/liked' && !roar.liked) {
+                        continue;
+                    }
+
+                    document.querySelector('#roar-list').insertAdjacentHTML('afterBegin', `
+                        <div class="card mb-1">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    ${roar.username}
+                        
+                                    <small class="text-muted float-right">${new Date(roar.date).toLocaleString('en-GB')}</small>
+                                </h5>
+                        
+                                <p class="card-text">${roar.message}</p>
+                                <button onclick="onFavButton(event.currentTarget, ${!roar.liked}, ${roar.RID}, ${roar.likes});" 
+                                        class="btn badge badge-pill ${roar.liked ? 'badge-danger' : 'badge-secondary'}"><b>&#10084;&emsp;${roar.likes}</b></button>
+                            </div>
+                        </div>
+                    `);
+                }
+            }
+
+            // ############################################### //
+            //     Handler for the Roar like buttons           //
+            // ############################################### //
+            function onFavButton(target, like, rid, nrLikes) {
+                // target: the button, like: like state (yes/no), rid: Roar ID, nrLikes: current number of likes
+                fetch("api/setFavState", {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    body: "fav=" + (like ? 1 : 0) + "&rid=" + rid
+                })
+                .then(resp => {
+                    // If not 200, e.g. the Roar ID was wrong
+                    if (!resp.ok)
+                        return;
+                    
+                    // Set badge for the like state and add/subtract like count appropriately
+                    target.classList.remove('badge-danger');
+                    target.classList.remove('badge-secondary');
+                    target.classList.add(like ? 'badge-danger' : 'badge-secondary');
+                    target.innerHTML = `<b>&#10084;&emsp;${nrLikes + (like ? 1 : -1)}</b>`
+                    
+                    // Overwrite the onclick handler with flipped like and nrLikes arguments
+                    target.onclick = event => onFavButton(event.currentTarget, !like, rid,  nrLikes + (like ? 1 : -1));
+                })
+                .catch(err => console.log(err));
+            }
+
+            // Setup handlers
+            document.querySelector('#roary-login form').addEventListener('submit', login);
+            document.querySelector('#roary-register form').addEventListener('submit', register);
+            document.querySelector('#roar-form form').addEventListener('submit', postRoar);
+            window.addEventListener('hashchange', routeChanged);
+            setInterval(fetchRoars, 10000);
+            routeChanged();
+
+            // Register service worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register("/roary-sw.js", {scope: "/"})
+                .then(reg => {})
+                .catch(err => console.log(err))
+            }
+        </script>
+    </body>
+</html>

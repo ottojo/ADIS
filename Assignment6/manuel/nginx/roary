@@ -1,0 +1,30 @@
+upstream loadbalancer {
+        least_conn;
+        server localhost:3500;
+        server localhost:3501;
+        server localhost:3502;
+        server localhost:3503;
+}
+
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    
+    index index.html index.htm index.nginx-debian.html;
+    server_name localhost;
+        
+    location / {
+        root /var/www/roary-public;
+        try_files $uri $uri/ =404;
+        
+        add_header Cache-Control public;
+        add_header Pragma public;
+        add_header Vary Accept-Encoding;
+        expires 1h;
+    }
+    
+    location /api/ {
+        proxy_pass http://loadbalancer;
+        proxy_buffering on;
+    }
+}
