@@ -19,7 +19,7 @@ redis is required for sharing session management data. Install e.g. via:
 
     ```console
     curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-    sudo apt install nodejs nginx redis
+    apt install nodejs nginx redis
     ```
 
 2. Inside the *node* folder, a single Roary instance can be run using `npm start`. However, we're going to run multiple instances of Roary in order to enable higher throughput (because Node.js is single-threaded). We use the *pm2* process manager for this. In order to install all dependencies and the *pm2* process manager, run e.g.:
@@ -33,17 +33,17 @@ redis is required for sharing session management data. Install e.g. via:
 3. The index HTML file is to be served statically by nginx, so copy it into the appropriate folder:
 
     ```console
-    sudo mkdir -p /var/www/roary-public
-    sudo cp -R -d node/public /var/www/roary-public/
+    mkdir -p /var/www/roary-public
+    cp -R -d node/public /var/www/roary-public/
     ```
 
 4. Change the nginx configuration to the *roary* configuration inside the *nginx* folder. Do this as follows:
 
     ```console
-    sudo cp nginx/roary /etc/nginx/sites-available/roary
-    sudo rm /etc/nginx/sites-enabled/*
-    sudo ln -s /etc/nginx/sites-available/roary /etc/nginx/sites-enabled/roary
-    sudo nginx -s reload
+    cp nginx/roary /etc/nginx/sites-available/roary
+    rm /etc/nginx/sites-enabled/*
+    ln -s /etc/nginx/sites-available/roary /etc/nginx/sites-enabled/roary
+    nginx -s reload
     ```
     
     Note, depending on the OS config, nginx might not have started (especially without
@@ -51,7 +51,7 @@ redis is required for sharing session management data. Install e.g. via:
     In this case, replace the reload command with:
     
     ```console
-    sudo nginx -c "/etc/nginx/nginx.conf"
+    nginx -c "/etc/nginx/nginx.conf"
     ```
     
     This starts the nginx process(es). Also note that the same thing applies to the redis
