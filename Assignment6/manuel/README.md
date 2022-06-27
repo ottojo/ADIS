@@ -22,7 +22,7 @@ redis is required for sharing session management data. Install e.g. via:
     sudo apt install nodejs nginx redis
     ```
 
-2. Inside the *node* folder, a single Roary instance can be run using `npm start`. However, we're going to run multiple instances of Roary in order to enable higher throughput (because Node.js is single-threaded). We use the *pm2* package manager for this. In order to install all dependencies and the *pm2* process manager, run e.g.:
+2. Inside the *node* folder, a single Roary instance can be run using `npm start`. However, we're going to run multiple instances of Roary in order to enable higher throughput (because Node.js is single-threaded). We use the *pm2* process manager for this. In order to install all dependencies and the *pm2* process manager, run e.g.:
 
     ```console
     cd node
