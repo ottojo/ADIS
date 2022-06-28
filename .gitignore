@@ -1,2 +1,2 @@
-*.db
 *.zip
+__pycache__/

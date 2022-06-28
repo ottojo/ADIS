@@ -28,36 +28,55 @@ In my project, I found the best open model tools to be **Gatling** and **k6**. T
 
     ```console
     docker build -t <NAME> .
-    docker run -v "$(pwd):/root" -it --rm <NAME>
+    docker run --network=host -v "$(pwd):/tests" -it --rm <NAME>
     ```
 * The container opens a console, see the "Running the tests" section below for details how to run the tests
 * In theory, for k6, the k6 container provided by grafana (`docker pull grafana/k6`) can also be used but our container
 also contains the R environment for generating the plots
-* Note that this solution mounts this folder in the container so all results will be available locally too. However,
-they will all be owned by root. To own them after being done, simply use `chown -R <USER>:<GROUP> .`
+* Note that this solution mounts this folder in the container's "/tests" directory, so all results will be available locally too. However, they will all be owned by root. To own them after being done, simply use `chown -R <USER>:<GROUP> .`
+* The test scripts accept the host as an argument (k6's "-e" option), *localhost* won't work because that refers to the container's environment. However, using the `--network=host` option as shown above but this will only work on Linux.
+Alternatively use a manual setup or use the "host.docker.internal" address (see [here](https://stackoverflow.com/questions/24319662/from-inside-of-a-docker-container-how-do-i-connect-to-the-localhost-of-the-mach)). Even better is executing the load generator and the target on different machines and then use proper host names or IP adresses.
 
 ### Manual setup
 
 * Install k6 as described [here](https://k6.io/docs/getting-started/installation/)
-* Note the "Troubleshooting" section below, sometimes there might be an error because of a missing directory which is not created by gpg by default
+* Note the "Troubleshooting" section below, sometimes there is an error because of a missing gpg directory which is not created by default
     
 ## Running the tests
 
 We conducted our tests for our implementations of Assignment 3 and 4. (**TODO**: Maybe add impl 2 ?)
 First, we'll briefly describe the folder structure:
 
-* The **impl** folder simply contains our solutions for Assignments 3 and 4. For Assignment 4, this is
+* The **impls** folder simply contains our solutions for Assignments 3 and 4. For Assignment 4, this is
 necessary, because we forgot to submit that one... (and for completeness, Assignment 3 is there as well).
-* The **test-scripts** folder contains the test scripts for our Assignment 3 and 4 Roary implementations.
-* The **raw-results** folder contains the *k6* metric logs for our test results
-* The **plots** folder contains an R script for generating plots from the raw results and the generated plots.
+* The **db-defaults** folder contains instructions and default database files for the tests.
+* The **scripts** folder contains test scripts and R scripts for plot generation.
+* The **results** folder contains raw *k6* CSV logs and the generated plots.
 
-In order to run the tests for an implementation, first setup the implementation as specified in the *impl* folder.
-Then run the test as follows:
+In general, for both assignments we provide the following test parameters:
+
+* **HOST**: Specifies the target host (e.g. "localhost:8080")
+* **MODE**: *count* (run a fixed number of requests), *duration* (run for a fixed number of time) and *rate* (run a fixed request rate). The former two follow a closed model and we only use the duration test in order to determine the maximum request rate the server can handle. The rate test follows an open model and ensures the specified request rate. This should be used for latency measurements due to the reasons explained above.
+* **SCENARIO**: *index*, *login*, *read*, *write* or *mixed*. *index* simply fetches the index page, *login* performs logins, *read* fetches 50 Roars from the server, *write* posts a Roar, and *mixed* combines *read* and *write* such that every tenth request is a write and all others are reads.
+* **DURATION**: The test duration in seconds (only for *rate* and *duration* modes)
+* **COUNT**: The number of requests (only for the *count* mode)
+* **RATE**: The request rate (only for *rate* mode)
+
+All of these parameters are mandatory except if not used by a mode (e.g. *COUNT* being only used in *count* mode). These test parameters are passed using k6's `-e` flag, e.g. `-e MODE=count`. Apart from these test parameters, there are some additional k6 flags which we'll use. In general, an running a test is done something like this:
 
 ```console
-TODO
+k6 run \
+    --out csv=./results/raw/Assignment<X>/<LOG_NAME>.csv \
+    # --http-debug=headers oder --http-debug=full, optional for debug output
+    -e HOST=<HOST> \
+    -e MODE=<MODE> -e SCENARIO=<SCENARIO> \
+    -e DURATION=<DUR> -e COUNT=<CNT> -e RATE=<RATE> \
+    ./scripts/tests/Assignment<X>.js
 ```
+
+Note, before running, the target should be reset into a comparable state. The easiest way to do this is by running the Roary implementations in a Docker container and resetting this container. Alternatively, with a manual setup, restarting the server process and resetting persistent data is also acceptable. For Roary, the only persistent data is database defaults which are provided in the *db-defaults* folder.
+
+## Generating the plots
 
 To generate the plots using the R script, do the following:
 
