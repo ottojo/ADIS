@@ -24,7 +24,7 @@ In my project, I found the best open model tools to be **Gatling** and **k6**. T
 ## Setup
 
 ### Docker setup
-* Build and run the container and ensure that this folder is mounted to /root
+* Build and run the container and ensure that this folder is mounted to /tests
 
     ```console
     docker build -t <NAME> .
