@@ -10,6 +10,9 @@ RUN gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gp
 RUN echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" > /etc/apt/sources.list.d/k6.list
 RUN apt update && apt install -y k6
 
+# Install R
+RUN apt install -y r-base r-cran-tidyverse
+
 # Create tests folder and declare as volume
 RUN mkdir /tests
 VOLUME /tests
