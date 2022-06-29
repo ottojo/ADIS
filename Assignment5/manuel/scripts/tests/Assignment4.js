@@ -100,5 +100,5 @@ export function mixed(cookie) {
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit, [...]",
             {headers: {"Content-Type": "text/plain"}})
     else
-        http.get(`http://${__ENV.HOST}/api/getRoars?upTo=0&limit=50`)
+        http.get(`http://${__ENV.HOST}/api/getRoars?upTo=0&limit=200`)
 }

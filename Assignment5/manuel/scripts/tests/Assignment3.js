@@ -65,8 +65,8 @@ export function setup() {
 
     // Login
     const res = http.post(`http://${__ENV.HOST}/accounts/login/`, {
-        username: "jonas",
-        password: "jonasjonas",
+        username: "MaxMustermann",
+        password: "y9viuxq4uw",
         csrfmiddlewaretoken: csrftoken,
     }, { redirects: 0 });
 
@@ -90,8 +90,8 @@ export function login() {
     const csrftoken = match[1];
 
     http.post(`http://${__ENV.HOST}/accounts/login`, {
-        email: (exec.scenario.iterationInTest % 100) + "@b.c",
-        password: "test",
+        username: "MaxMustermann",
+        password: "y9viuxq4uw",
         csrfmiddlewaretoke: csrftoken,
     })
 }

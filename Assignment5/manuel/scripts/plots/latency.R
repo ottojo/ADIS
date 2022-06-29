@@ -18,7 +18,7 @@ for (i in seq(1, nrow(files))) {
   k6data <- read_csv(files[i,3], col_types = "cddccdlccccccicccc")
   k6data <- k6data[k6data$metric_name=="http_req_duration" & !is.na(k6data$scenario) & k6data$scenario=="test",]
   k6data <- k6data$metric_value
-  perc <- c(seq(0,0.95,0.05), 0.99, 0.999)
+  perc <- c(seq(0,0.99,0.01), 0.999, 0.9999)
   
   frame <- tibble(
     files[i,1],
@@ -37,12 +37,13 @@ perc_trans <- trans_new("perc-trans",
                         domain=c(0,1))
 
 plt <- ggplot(data, aes(x = perc)) + 
-  geom_line(aes(y = lat, colour = type)) +
+  geom_line(aes(y = lat, colour = factor(rate))) +
   scale_x_continuous(trans=perc_trans, breaks = perc_probs, labels = scales::label_percent()) +
   xlab("Percentile") +
   ylab("Response Time [ms]") +
-  ggtitle(if (length(args) >= 1) args[1] else "Latency Percentiles") + # TODO: Adjust title
-  theme(legend.position = "bottom", legend.title = element_blank(), plot.title = element_text(hjust = 0.5)) +
-  facet_wrap(~rate, labeller = label_both, scales = "free")
+  ggtitle(if (length(args) >= 1) args[1] else "Latency Percentiles") +
+  scale_color_discrete(name = "Rate") +
+  theme(legend.position = "bottom", plot.title = element_text(hjust = 0.5)) +
+  facet_wrap(~type, labeller = label_both, scales = "free")
 
-ggsave("/dev/stdout", plt, "svg")
+ggsave("/dev/stdout", plt, "svg", width = 10, height = 10 / sqrt(2))
