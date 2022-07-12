@@ -1,20 +1,77 @@
+{% load humanize %}
+
 <html lang="en">
 <head>
     <title>Roar!</title>
     <script>
-        function updateRoars() {
-            console.log("updating roars");
-            const xhttp = new XMLHttpRequest();
-            xhttp.onload = function () {
-                const container = document.getElementById("roarlist");
-                container.innerHTML = this.responseText;
-            }
-            xhttp.open("GET", "{% url 'roars:roars_html' %}", true);
-            xhttp.send();
-        }
+        window.addEventListener("load", function () {
+            function postRoar() {
+                const roarTextBox = document.querySelector('#postForm > fieldset > textarea[name="text"]')
+                const roar = roarTextBox.value;
+                console.log("Posting roar:", roar);
 
-        updateRoars();
-        //setInterval(updateRoars, 1000);
+                const XHR = new XMLHttpRequest();
+
+                XHR.addEventListener("load", function (event) {
+                    // Show potential error message
+                    if (XHR.status !== 200) {
+                        alert(event.target.responseText);
+                    }
+                });
+
+                XHR.addEventListener("error", function (event) {
+                    alert('Oops! Something went wrong while posting roar.');
+                });
+
+                XHR.open("POST", "{% url 'roars:post' %}");
+                XHR.send(roar);
+            }
+
+            // Access the form element...
+            const form = document.getElementById("postForm");
+            if (form == null) {
+                return;
+            }
+
+            // ...and take over its submit event.
+            form.addEventListener("submit", function (event) {
+                event.preventDefault();
+                postRoar();
+            });
+        });
+    </script>
+    <script>
+        const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/api/ws/firehose/'
+        );
+
+        chatSocket.onmessage = function (e) {
+            console.log(e.data);
+
+            const container = document.getElementById("roarlist");
+
+            let list = container.querySelector("ul");
+
+            if (list == null) {
+                container.innerHTML = "<ul></ul>";
+                list = container.querySelector("ul");
+            }
+
+            const roar = JSON.parse(e.data);
+
+            const likeUrl = "{% url 'roars:like' 0 %}".slice(0, -1) + roar.id;
+
+            list.insertAdjacentHTML("afterbegin",
+                `<li>${roar.author_name}, ${roar.time}: ${roar.text} (${roar.likes})
+                    <a href="${likeUrl}">like</a>
+                 </li>`);
+        };
+
+        chatSocket.onclose = function (e) {
+            console.error('Firehose socket closed unexpectedly');
+        };
     </script>
 </head>
 
@@ -31,15 +88,10 @@
 {% endif %}
 
 {% if user.is_authenticated %}
-    <form action="{% url 'roars:post' %}" method="post">
+    <form action="{% url 'roars:post' %}" method="post" id="postForm">
         {% csrf_token %}
         <fieldset>
             <legend><h2>Post a Roar!</h2></legend>
-
-            {% if error_message %}
-                <p><strong>{{ error_message }}</strong></p>
-            {% endif %}
-
             <textarea name="text" cols="50" rows="4"></textarea>
             <br>
             <input type="submit" value="Roar">
@@ -48,6 +100,24 @@
 {% endif %}
 
 <div id="roarlist">
+    {% if latest_roars_list %}
+        <ul>
+            {% for roar in latest_roars_list %}
+                <li>{{ roar.author.username }}, {{ roar.timestamp | naturaltime }}: {{ roar.text }}
+                    ({{ roar.likes.count }})
+                    {% if user.is_authenticated %}
+                        {% if user in roar.likes.all %}
+                            <a href="{% url 'roars:unlike' roar.id %}">unlike</a>
+                        {% else %}
+                            <a href="{% url 'roars:like' roar.id %}">like</a>
+                        {% endif %}
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No roars are available.</p>
+    {% endif %}
 </div>
 </body>
 </html>
