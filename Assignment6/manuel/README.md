@@ -21,7 +21,7 @@ We'll now discuss both aspects in more detail.
 
 ## Considered and implemented concepts
 
-### Concept: **HTTP/2 and WebSockets**, Implemented: **No**
+### Concept: **HTTP/2 and WebSockets**, Implemented: **Partly**
 
 This would arguably one of the most important concepts to implement for the Roary use case.
     
@@ -30,6 +30,8 @@ HTTP/2 eliminates a lot of HTTP/1.1 problems and the WebSocket protocol allows f
 First, evaluating the performance is a lot harder with WebSocket's since messages must be initiated on the server side and tool support is not as mature as for HTTP. And although HTTP/2 is supported by k6, it's not supported by express.
     
 The second reason is statelessness. A push-based communication model is generally stateful (remembering which messages were pushed) and we chose a stateless approach. We considered implementing this concept via socket.io and achieving statelessness using socket.io-redis but didn’t have enough time for this (as it would require to completely change the setup and basically start anew).
+
+A proof of concept was implemented for pushing new roars to the index page using WebSockets. This was however done independently from the other changes in the Django based solution, and not methodically evaluated. Details are available in the appendix at the end of the document.
 
 ### Concept: **REST**, Implemented: **Yes**
 
@@ -108,3 +110,37 @@ The write results are the most interesting results because here, the old and new
 As the mixed test is a combination of the read and the write test, the results are also a mixture of the read and write results. The response time curves look mostly similar to the ones for the read results because 90% of all requests are read requests. The 10% write requests don't have such a large impact because of the lower write "pressure" but we can still see a slight effect when considering that the response time numbers are slightly higher for larger percentiles just as it is the case for the write results.
 
 ![](./benchmarks/results/plots/latency-mixed.svg){width=80%}
+
+## Appendix: WebSocket communication in Django
+
+### Problem
+
+All previous roary implementations poll for new roars periodically on the home page.
+Even with the optimization of only replying with roars the client is not already
+displaying, this is inefficient and results in poor user experience, since new
+roars appear delayed.
+
+### Solution
+
+On the index page a WebSocket connection should be established with the server. This allows the server to push updates
+to the clients, which is done whenever a new roar is posted. The update contains the full roar data to enable the client
+to render the roar without any further requests.
+
+### Implementation
+
+The Django [channels library](https://channels.readthedocs.io/en/stable/) is used, which allows Django to manage
+websocket clients ("consumers") and routing between channels, groups and server instances.
+The `action/post` API endpoint is extended to send every newly posted roar to all connected websocket clients.
+
+The `action/post` API call from the index page is modified to call the API in the background using AJAX, as the new
+websocket feature displays the newly added roar almost instantly. This removes the need to visit the poll endpoint
+directly, resulting in a redirect to the index page and an additional request.
+
+### Evaluation
+
+Initial loading of roars is unchanged, but the previously slow polling request is eliminated entirely.
+Each open page now results in only one open websocket connection, instead of two (possibly large)
+HTTP requests per polling interval.
+The number of requests for posting a roar is improved from two to one.
+Site interactivity is successfully improved, as new roars get pushed to the client immediately, without needing to
+wait for the polling interval.
